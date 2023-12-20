@@ -7,8 +7,8 @@ from st_components.utils.prompts import PROMPTS
 
 from loguru import logger
 
+
 def init_session_states():
-    
     if 'models' not in st.session_state:
         with open("models.json", "r") as file:
             st.session_state['models'] = json.load(file)
@@ -21,5 +21,4 @@ def init_session_states():
     if 'user_id' not in st.session_state:
         st.session_state['user_id'] = str(uuid.uuid4())
     if 'interpreter' not in st.session_state:
-        print(f"st_session_states.py: opencodeinterpreter: {opencodeinterpreter}")
         st.session_state['interpreter'] = opencodeinterpreter
