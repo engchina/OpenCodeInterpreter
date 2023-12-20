@@ -13,9 +13,11 @@ class MessageBlock(BaseBlock):
 
         self.type = "message"
         self.message = ""
+        self.has_run = False
 
     def refresh(self, cursor=True):
-        # 将Markdown中的所有代码块去除样式，以与我们的代码块区分开来。
+        # De-stylize any code blocks in markdown,
+        # to differentiate from our Code Blocks
         content = textify_markdown_code_blocks(self.message)
 
         if cursor:
@@ -29,19 +31,19 @@ class MessageBlock(BaseBlock):
 
 def textify_markdown_code_blocks(text):
     """
-    为了将CodeBlocks与Markdown代码区分开来，我们只需将所有的Markdown代码
-    （如'```python...'）转换为文本代码块（'```text'），这样代码就会变成黑白的。
+    To distinguish CodeBlocks from markdown code, we simply turn all markdown code
+    (like '```python...') into text code blocks ('```text') which makes the code black and white.
     """
     replacement = "```text"
     lines = text.split("\n")
     inside_code_block = False
 
     for i in range(len(lines)):
-        # 如果行与```符号（可选择的语言说明符）匹配
+        # If the line matches ``` followed by optional language specifier
         if re.match(r"^```(\w*)$", lines[i].strip()):
             inside_code_block = not inside_code_block
 
-            # 如果我们刚刚进入了代码块，替换标记
+            # If we just entered a code block, replace the marker
             if inside_code_block:
                 lines[i] = replacement
 

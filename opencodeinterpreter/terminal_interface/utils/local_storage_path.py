@@ -2,8 +2,8 @@ import os
 
 import appdirs
 
-# 使用appdirs确定用户特定的配置路径
-config_dir = appdirs.user_config_dir("Open Code Interpreter")
+# Using appdirs to determine user-specific config path
+config_dir = appdirs.user_config_dir("Open Interpreter")
 
 
 def get_storage_path(subdirectory=None):

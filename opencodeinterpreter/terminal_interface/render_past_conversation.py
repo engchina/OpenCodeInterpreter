@@ -1,8 +1,3 @@
-"""
-This is all messed up.... Uses the old streaming structure.
-"""
-
-
 from .components.code_block import CodeBlock
 from .components.message_block import MessageBlock
 from .utils.display_markdown_message import display_markdown_message

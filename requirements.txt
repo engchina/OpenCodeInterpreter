@@ -1,7 +1,9 @@
+# for opencodeinterpreter
 gradio==4.10.0
 python-dotenv==1.0.0
 jupyter==1.0.0
-openai==1.5.0
+#openai==1.5.0
+openai==0.28.1 # litellm 0.13.2 depends on openai<0.29.0 and >=0.27.0
 pandas==2.1.4
 matplotlib==3.8.2
 requests~=2.31.0
@@ -10,3 +12,18 @@ inquirer==3.1.4
 rich==13.7.0
 appdirs==1.4.4
 packaging==23.2
+litellm==0.13.2
+semgrep==1.42.0
+tokentrim==0.1.13
+pytest==7.4.3
+psutil==5.9.6
+ipython==8.18.1
+yaspin==3.0.1
+pyreadline3==3.4.1
+html2image==2.0.4.3
+
+# for streamlit
+streamlit==1.27.1
+streamlit-option-menu==0.3.6
+streamlit-extras==0.3.2
+loguru==0.7.2

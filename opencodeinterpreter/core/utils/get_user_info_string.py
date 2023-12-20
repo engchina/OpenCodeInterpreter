@@ -9,5 +9,4 @@ def get_user_info_string():
     operating_system = platform.system()
     default_shell = os.environ.get("SHELL")
 
-    return (f"[User Info]\nName: {username}\n"
-            f"CWD: {current_working_directory}\nSHELL: {default_shell}\nOS: {operating_system}")
+    return f"[User Info]\nName: {username}\nCWD: {current_working_directory}\nSHELL: {default_shell}\nOS: {operating_system}"

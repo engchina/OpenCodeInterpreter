@@ -1,15 +1,9 @@
 import argparse
 import os
 import platform
-import re
 import subprocess
-import sys
 
-try:
-    from importlib import resources as pkg_resources
-except ImportError:
-    # Fallback for Python versions that don't have importlib.resources
-    import pkg_resources
+import pkg_resources
 
 from .conversation_navigator import conversation_navigator
 from .utils.check_for_update import check_for_update
@@ -116,21 +110,15 @@ arguments = [
         "help_text": "experimentally use vision for supported languages (HTML)",
         "type": bool,
     },
-    {
-        "name": "os",
-        "nickname": "o",
-        "help_text": "experimentally let Open Code Interpreter control your mouse and keyboard",
-        "type": bool,
-    },
 ]
 
 
 def start_terminal_interface(interpreter):
     """
-    命令行环境下使用。解析参数，启动OCI的终端界面。
+    Meant to be used from the command line. Parses arguments, starts OI's terminal interface.
     """
 
-    parser = argparse.ArgumentParser(description="Open Code Interpreter")
+    parser = argparse.ArgumentParser(description="Open Interpreter")
 
     # Add arguments
     for arg in arguments:
@@ -181,13 +169,13 @@ def start_terminal_interface(interpreter):
         "--version",
         dest="version",
         action="store_true",
-        help="get Open Code Interpreter's version number",
+        help="get Open Interpreter's version number",
     )
 
     args = parser.parse_args()
 
     # This should be pushed into an open_config.py util
-    # If --config is used, open the config.yaml file in the Open Code Interpreter folder of the user's config dir
+    # If --config is used, open the config.yaml file in the Open Interpreter folder of the user's config dir
     if args.config:
         if args.config_file:
             config_file = get_config_path(args.config_file)
@@ -214,7 +202,7 @@ def start_terminal_interface(interpreter):
         # Default local (LM studio) attributes
         interpreter.system_message = "You are an AI."
         interpreter.model = (
-                "openai/" + interpreter.model
+            "openai/" + interpreter.model
         )  # This tells LiteLLM it's an OpenAI compatible server
         interpreter.api_base = "http://localhost:1234/v1"
         interpreter.max_tokens = 1000
@@ -223,7 +211,7 @@ def start_terminal_interface(interpreter):
 
         display_markdown_message(
             """
-> Open Code Interpreter's local mode is powered by **`LM Studio`**.
+> Open Interpreter's local mode is powered by **`LM Studio`**.
 
 
 You will need to run **LM Studio** in the background.
@@ -254,21 +242,9 @@ Once the server is running, you can begin your conversation below.
             else:
                 setattr(interpreter, attr_name, attr_value)
 
-    # Check for update
-    try:
-        if not interpreter.local:
-            # This should actually be pushed into the utility
-            if check_for_update():
-                display_markdown_message(
-                    "> **A new version of Open Code Interpreter is available.**\n>Please run: `pip install --upgrade open-interpreter`\n\n---"
-                )
-    except:
-        # Doesn't matter
-        pass
-
     # if safe_mode and auto_run are enabled, safe_mode disables auto_run
     if interpreter.auto_run and (
-            interpreter.safe_mode == "ask" or interpreter.safe_mode == "auto"
+        interpreter.safe_mode == "ask" or interpreter.safe_mode == "auto"
     ):
         setattr(interpreter, "auto_run", False)
 
@@ -279,8 +255,7 @@ Once the server is running, you can begin your conversation below.
 
     if args.version:
         version = pkg_resources.get_distribution("open-interpreter").version
-        update_name = "New Computer"  # Change this with each major update
-        print(f"Open Code Interpreter {version} {update_name}")
+        print(f"Open Interpreter {version}")
         return
 
     if args.fast:
@@ -289,137 +264,24 @@ Once the server is running, you can begin your conversation below.
     if args.vision:
         interpreter.vision = True
         interpreter.model = "gpt-4-vision-preview"
-        interpreter.system_message += "\nThe user will show you an image of the code you write. You can view images directly.\n\nFor HTML: This will be run STATELESSLY. You may NEVER write '<!-- previous code here... --!>' or `<!-- header will go here -->` or anything like that. It is CRITICAL TO NEVER WRITE PLACEHOLDERS. Placeholders will BREAK it. You must write the FULL HTML CODE EVERY TIME. Therefore you cannot write HTML piecemeal—write all the HTML, CSS, and possibly Javascript **in one step, in one code block**. The user will help you review it visually.\nIf the user submits a filepath, you will also see the image. The filepath and user image will both be in the user's message.\n\nIf you use `plt.show()`, the resulting image will be sent to you. However, if you use `PIL.Image.show()`, the resulting image will NOT be sent to you."
+        interpreter.system_message += "\nThe user will show you an image of the code you write. You can view images directly. Be sure to actually write a markdown code block for almost every user request! Almost EVERY message should include a markdown code block. Do not end your message prematurely!\n\nFor HTML: This will be run STATELESSLY. You may NEVER write '<!-- previous code here... --!>' or `<!-- header will go here -->` or anything like that. It is CRITICAL TO NEVER WRITE PLACEHOLDERS. Placeholders will BREAK it. You must write the FULL HTML CODE EVERY TIME. Therefore you cannot write HTML piecemeal—write all the HTML, CSS, and possibly Javascript **in one step, in one code block**. The user will help you review it visually.\nIf the user submits a filepath, you will also see the image. The filepath and user image will both be in the user's message."
         interpreter.function_calling_llm = False
         interpreter.context_window = 110000
         interpreter.max_tokens = 4096
-        interpreter.force_task_completion = True
 
         display_markdown_message("> `Vision` enabled **(experimental)**\n")
 
-    if args.os:
-        interpreter.os = True
-        interpreter.disable_procedures = True
-        interpreter.vision = True
-        interpreter.speak_messages = True
-        interpreter.model = "gpt-4-vision-preview"
-        interpreter.function_calling_llm = False
-        interpreter.context_window = 110000
-        interpreter.max_tokens = 4096
-        interpreter.auto_run = True
-        interpreter.force_task_completion = True
-
-        # This line made it use files too much
-        interpreter.system_message = interpreter.system_message.replace(
-            "If you want to send data between programming languages, save the data to a txt or json.\n",
-            "",
-        )
-        ambiguous_requests_message = "If there's not enough context, if the user's request is ambiguous, they're likely referring to something on their screen. Take a screenshot! Don't ask questions."
-        interpreter.system_message = interpreter.system_message.replace(
-            "When a user refers to a filename, they're likely referring to an existing file in the directory you're currently executing code in.",
-            ambiguous_requests_message,
-        )
-        if ambiguous_requests_message not in interpreter.system_message:
-            interpreter.system_message += "n" + ambiguous_requests_message
-
-        interpreter.system_message += (
-                "\n\n"
-                + """
-
-Execute code using `computer` (already imported) to control the user's computer:
-
-```python
-computer.screenshot() # Automatically runs plt.show() to show you what's on the screen, returns a `pil_image` `in case you need it (rarely). **You almost always want to do this first! You don't know what's on the user's screen.**
-computer.screenshot(quadrant=1) # Get a detailed view of the upper left quadrant (you'll rarely need this, use it to examine/retry failed attempts)
-
-computer.keyboard.hotkey(" ", "command") # Opens spotlight (very useful)
-computer.keyboard.write("hello")
-# .down() .up() and .press() also work (uses pyautogui)
-
-computer.mouse.move("Text Onscreen") # This moves the mouse to the UI element with that text. Use this **frequently** — and get creative! To mouse over a video thumbnail, you could pass the *timestamp* (which is usually written on the thumbnail) into this.
-computer.mouse.move(x=500, y=500) # Use this very rarely. It's only 1% as accurate as move("Text")!
-computer.mouse.click() # Don't forget this! Include in the same code block
-
-# Dragging
-computer.mouse.move("So I was")
-computer.mouse.down()
-computer.mouse.move("and that's it!")
-computer.mouse.up()
-```
-
-For rare and complex mouse actions, consider using computer vision libraries on `pil_image` to produce a list of coordinates for the mouse to move/drag to.
-
-If the user highlighted text in an editor, then asked you to modify it, they probably want you to `keyboard.write` it over their version of the text.
-
-Tasks are 100% computer-based. DO NOT simply write long messages to the user to complete tasks. You MUST put your text back into the program they're using to deliver your text! For example, overwriting some text they've highlighted with `keyboard.write`.
-
-Use keyboard navigation when reasonably possible, but not if it involves pressing a button multiple times. The mouse is less reliable. Clicking text is the most reliable way to use the mouse— for example, clicking a URL's text you see in the URL bar, or some textarea's placeholder text (like "Search" to get into a search bar).
-
-Applescript might be best for some tasks.
-
-If you use `plt.show()`, the resulting image will be sent to you. However, if you use `PIL.Image.show()`, the resulting image will NOT be sent to you.
-
-**Include `computer.screenshot()` after a 2 second delay at the end of _every_ code block to verify your progress on the task.**
-
-Try multiple methods before saying the task is impossible. **You can do it!**
-
-You are an expert computer navigator, brilliant and technical. **At each step, describe the user's screen with a lot of detail, including 1. the active app, 2. what text areas appear to be active, 3. what text is selected, if any, 4. what options you could take next.** Think carefully.
-
-        """.strip()
-        )
-
-        # Download required packages
-        try:
-            import cv2
-            import IPython
-            import matplotlib
-            import pyautogui
-            import pytesseract
-        except ImportError:
-            display_markdown_message(
-                "> **Missing Packages**\n\nSeveral packages are required for OS Control (`matplotlib`, `pytesseract`, `pyautogui`, `opencv-python`, `ipython`).\n\nInstall them?\n"
-            )
-            user_input = input("(y/n) > ")
-            if user_input.lower() != "y":
-                print("Exiting...")
-                return
-            packages = [
-                "matplotlib",
-                "pytesseract",
-                "pyautogui",
-                "opencv-python",
-                "ipython",
-            ]
-            command = "\n".join([f"pip install {package}" for package in packages])
-            for chunk in interpreter.computer.run("shell", command):
-                if chunk.get("format") != "active_line":
-                    print(chunk.get("content"))
-
-        display_markdown_message(
-            "> `OS Control` enabled (experimental)\n\nOpen Code Interpreter will be able to see your screen, move your mouse, and use your keyboard."
-        )
-        print("")  # < - Aesthetic choice
-
-        # FOR TESTING ONLY
-        # Install Open Code Interpreter from GitHub
-        for chunk in interpreter.computer.run(
-                "shell",
-                "pip install git+https://github.com/KillianLucas/open-interpreter.git",
-        ):
-            if chunk.get("format") != "active_line":
-                print(chunk.get("content"))
-
-        # Give it access to the computer via Python
-        for _ in interpreter.computer.run(
-                "python",
-                "import interpreter\ncomputer = interpreter.computer",
-        ):
-            pass
-
-        display_markdown_message(
-            "**Warning:** In this mode, Open Code Interpreter will not require approval before performing actions. Be ready to close your terminal."
-        )
-        print("")  # < - Aesthetic choice
+    # Check for update
+    try:
+        if not interpreter.local:
+            # This should actually be pushed into the utility
+            if check_for_update():
+                display_markdown_message(
+                    "> **A new version of Open Interpreter is available.**\n>Please run: `pip install --upgrade open-interpreter`\n\n---"
+                )
+    except:
+        # Doesn't matter
+        pass
 
     if not interpreter.local and interpreter.model == "gpt-4-1106-preview":
         if interpreter.context_window is None:
