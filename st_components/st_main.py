@@ -55,9 +55,4 @@ def render_messages():
 
 def introduction():
     # Introduction
-    # st.info("👋 Hey, we're very happy to see you here. 🤗")
-    # st.info("👉 Set your OpenAI api base and OpenAI api key, to be able to run code while you generate it 🚀")
-    # st.error("👉 The objective of this project is to show an easy implementation of the use of Open Code Interpreter 🤗")
-    st.info("👋 ようこそ！あなたのご来訪を歓迎いたします。 🤗")
-    st.info("👉 コード生成中に実行できるように、OpenAI API ベースと OpenAI API キーを設定してください。 🚀")
-    st.error("👉 このプロジェクトの目的は、Open Code Interpreter の使用例を簡単に実装して示すことです。 🤗")
+    st.info("👋 ようこそ！👋 ")

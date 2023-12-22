@@ -9,7 +9,7 @@ def chat_with_interpreter():
     
     # GENERATE MESSAGES
     # if prompt := st.chat_input(placeholder="Write here your message", disabled=not st.session_state['chat_ready']):
-    if prompt := st.chat_input(placeholder="メッセージを書いてください", disabled=not st.session_state['chat_ready']):
+    if prompt := st.chat_input(placeholder="Message Open Code Interpreter...", disabled=not st.session_state['chat_ready']):
 
         setup_interpreter()
 

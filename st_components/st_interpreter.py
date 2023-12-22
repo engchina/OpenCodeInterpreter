@@ -7,8 +7,7 @@ def setup_interpreter():
     except:
         pass
 
-    if st.session_state['api_choice'] == 'Local LLM' or st.session_state['api_choice'] == 'openapi':
-        print(f"st_interpreter.py: st.session_state['api_choice']: {st.session_state['api_choice']}")
+    if st.session_state['api_choice'] == 'Local LLM':
         st.session_state['interpreter'].api_base = st.session_state['openai_api_base']
         st.session_state['interpreter'].api_key = st.session_state['openai_api_key']
 
@@ -24,4 +23,4 @@ def setup_interpreter():
     st.session_state['interpreter'].max_tokens = st.session_state['max_tokens']
     st.session_state['interpreter'].system_message = st.session_state['system_message']
     st.session_state['interpreter'].auto_run = True
-    st.session_state['interpreter'].local = False
+    st.session_state['interpreter'].local = True
