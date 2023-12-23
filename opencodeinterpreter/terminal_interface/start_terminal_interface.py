@@ -39,7 +39,7 @@ arguments = [
     {
         "name": "disable_procedures",
         "nickname": "dp",
-        "help_text": "disables procedures (RAG of some common OI use-cases). disable to shrink system message. auto-disabled for non-OpenAI models",
+        "help_text": "disables procedures (RAG of some common OCI use-cases). disable to shrink system message. auto-disabled for non-OpenAI models",
         "type": bool,
     },
     {
@@ -115,10 +115,10 @@ arguments = [
 
 def start_terminal_interface(interpreter):
     """
-    Meant to be used from the command line. Parses arguments, starts OI's terminal interface.
+    Meant to be used from the command line. Parses arguments, starts OCI's terminal interface.
     """
 
-    parser = argparse.ArgumentParser(description="Open Interpreter")
+    parser = argparse.ArgumentParser(description="Open Code Interpreter")
 
     # Add arguments
     for arg in arguments:

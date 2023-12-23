@@ -148,7 +148,7 @@ def terminal_interface(interpreter, message):
                 # Execution notice
                 if "executing" in chunk:
                     if not interpreter.auto_run:
-                        # OI is about to execute code. The user wants to approve this
+                        # OCI is about to execute code. The user wants to approve this
 
                         # End the active block so you can run input() below it
                         active_block.end()

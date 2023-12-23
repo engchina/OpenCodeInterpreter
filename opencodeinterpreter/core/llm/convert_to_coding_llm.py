@@ -5,7 +5,7 @@ from .setup_text_llm import setup_text_llm
 def convert_to_coding_llm(text_llm, debug_mode=False):
     """
     Takes a text_llm
-    returns an OI Coding LLM (a generator that takes OI messages and streams deltas with `message`, 'language', and `code`).
+    returns an OCI Coding LLM (a generator that takes OCI messages and streams deltas with `message`, 'language', and `code`).
     """
 
     def coding_llm(messages):
@@ -37,7 +37,7 @@ def convert_to_coding_llm(text_llm, debug_mode=False):
         else:
             # Last message came from the assistant.
 
-            # (The below should actually always be True in OI if last message came from the assistant)
+            # (The below should actually always be True in OCI if last message came from the assistant)
             # I think we don't need this actually.
             """
             if "output" in messages[-1]:

@@ -25,6 +25,7 @@ html2image==2.0.4.3
 scikit-learn==1.3.2
 scipy==1.11.4
 langchain==0.0.352
+seaborn==0.13.0
 
 # for streamlit
 streamlit==1.29.0

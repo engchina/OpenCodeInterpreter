@@ -18,7 +18,7 @@ def convert_to_openai_messages(messages, function_calling=True):
                     "arguments": json.dumps(
                         {"language": message["language"], "code": message["code"]}
                     ),
-                    # parsed_arguments isn't actually an OpenAI thing, it's an OI thing.
+                    # parsed_arguments isn't actually an OpenAI thing, it's an OCI thing.
                     # but it's soo useful! we use it to render messages to text_llms
                     "parsed_arguments": {
                         "language": message["language"],

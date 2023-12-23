@@ -37,7 +37,7 @@ function_schema = {
 def setup_openai_coding_llm(interpreter):
     """
     Takes an Interpreter (which includes a ton of LLM settings),
-    returns a OI Coding LLM (a generator that takes OI messages and streams deltas with `message`, `language`, and `code`).
+    returns a OCI Coding LLM (a generator that takes OCI messages and streams deltas with `message`, `language`, and `code`).
     """
 
     def coding_llm(messages):

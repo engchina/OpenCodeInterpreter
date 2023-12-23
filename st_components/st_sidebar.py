@@ -44,7 +44,7 @@ def about_us():
 
 def set_local_llm_server_credentials():
     with st.expander(label="Settings", expanded=(not st.session_state['chat_ready'])):
-        openai_api_base = st.text_input('API Base:', type="default", value="http://192.168.31.15:8000/v1")
+        openai_api_base = st.text_input('API Base:', type="default", value="http://192.168.31.12:8000/v1")
         openai_api_key = st.text_input('API Key:', type="password", value="fake_key")
         os.environ['OPENAI_API_BASE'] = openai_api_base
         os.environ['OPENAI_API_KEY'] = openai_api_key
