@@ -162,3 +162,10 @@ cython_debug/
 .env
 
 chats.db
+
+flagged/
+gradio_cached_examples/
+
+webui.py
+webui2.py
+workspace/analytic_ai_v1.csv

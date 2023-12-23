@@ -1,3 +1,6 @@
+import contextlib
+import io
+
 import gradio as gr
 
 import opencodeinterpreter as interpreter
@@ -7,57 +10,36 @@ interpreter.api_key = "fake_key"
 interpreter.auto_run = True
 interpreter.local = False
 
-with gr.Blocks() as demo:
-    chatbot = gr.Chatbot()
-    msg = gr.Textbox()
+
+def chat_with_interpreter(message, history, openai_api_key):
+    # interpreter.api_key = openai_api_key
+    if message == 'reset':
+        interpreter.reset()
+    # Redirect stdout to capture the streamed output
+    new_stdout = io.StringIO()
+    with contextlib.redirect_stdout(new_stdout):
+        interpreter.chat(message)
+    output = new_stdout.getvalue()
+
+    # Return this output so Gradio's ChatInterface can display it
+    return output
 
 
-    def user(user_message, history):
-        return "", history + [[user_message, None]]
+openai_api_key = gr.Textbox(label='OpenAI API Key', interactive=True)
+additional_inputs = [openai_api_key]
+examples = [["what is 2+2?"],
+            ["Can you solve for x: 10x -65=0?"],
+            ["What are top 10 headlines from BBC from last week?"]
+            ],
 
-
-    def bot(history):
-
-        user_message = history[-1][0]
-        history[-1][1] = ""
-        active_block_type = ""
-
-        for chunk in interpreter.chat(user_message, stream=True, display=False):
-
-            # Message
-            if "message" in chunk:
-                if active_block_type != "message":
-                    active_block_type = "message"
-                history[-1][1] += chunk["message"]
-                yield history
-
-            # Code
-            if "language" in chunk:
-                language = chunk["language"]
-            if "code" in chunk:
-                if active_block_type != "code":
-                    active_block_type = "code"
-                    history[-1][1] += f"\n```{language}\n"
-                history[-1][1] += chunk["code"]
-                yield history
-
-            # Output
-            if "executing" in chunk:
-                history[-1][1] += "\n```\n\n```text\n"
-                yield history
-            if "output" in chunk:
-                if chunk["output"] != "KeyboardInterrupt":
-                    history[-1][1] += chunk["output"] + "\n"
-                    yield history
-            if "end_of_execution" in chunk:
-                history[-1][1] = history[-1][1].strip()
-                history[-1][1] += "\n```\n"
-                yield history
-
-
-    msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False).then(
-        bot, chatbot, chatbot
-    )
-
-demo.queue()
+demo = gr.ChatInterface(fn=chat_with_interpreter,
+                        title="Open-Interpreter Gradio ChatInterface",
+                        description="Open Interpreter lets LLMs run code (Python, Javascript, Shell, and more) locally",
+                        clear_btn=None,
+                        retry_btn=None,
+                        undo_btn=None,
+                        # examples=examples,
+                        additional_inputs=additional_inputs,
+                        additional_inputs_accordion_name="OpenAI API Key",
+                        ).queue()
 demo.launch(debug=True)

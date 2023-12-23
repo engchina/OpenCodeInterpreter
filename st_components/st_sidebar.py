@@ -57,7 +57,7 @@ def set_local_llm_server_credentials():
         context_window = st.session_state['models']['openai'][model]['context_window']
 
         temperature = st.slider('🌡 Temperature', min_value=0.01, max_value=1.0,
-                                value=st.session_state.get('temperature', 0.01), step=0.01)
+                                value=st.session_state.get('temperature', 0.00), step=0.01)
         max_tokens = st.slider('📝 Max tokens', min_value=1, max_value=2048,
                                value=st.session_state.get('max_tokens', 2048), step=1)
 
